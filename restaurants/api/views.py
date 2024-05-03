@@ -1,5 +1,5 @@
 from ..models import Restaurants, MenuItem
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from .serializers import RestaurantsSerializer, MenuItemSerializer
 
 
@@ -8,7 +8,10 @@ class RestaurantViewSet(viewsets.ModelViewSet):
     serializer_class = RestaurantsSerializer
 
 
-class MenuItemViewSet(viewsets.ModelViewSet):
-    queryset = MenuItem.objects.all()
+class MenuItemsByRestaurantAPIView(generics.ListAPIView):
     serializer_class = MenuItemSerializer
 
+    def get_queryset(self):
+        restaurant__id = self.request.query_params.get('restaurant_id')
+        queryset = MenuItem.objects.filter(restaurant_id=restaurant__id)
+        return queryset
