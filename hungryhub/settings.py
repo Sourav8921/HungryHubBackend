@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'restaurants.apps.RestaurantsConfig',
     'users.apps.UsersConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders'
 ]
 
@@ -128,13 +129,14 @@ MEDIA_URL = 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',  # Uncomment for JWT authentication
     ],
 }
 
