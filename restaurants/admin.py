@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Restaurants, MenuItem
+from .models import Restaurant, MenuItem
 
 
 class RestaurantsAdmin(admin.ModelAdmin):
@@ -10,5 +10,5 @@ class MenuItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'restaurant', 'price')
 
 
-admin.site.register(Restaurants, RestaurantsAdmin)
+admin.site.register(Restaurant, RestaurantsAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)

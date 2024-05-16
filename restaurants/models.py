@@ -2,9 +2,10 @@ import os
 
 from django.db import models
 from PIL import Image
+from users.models import CustomUser
 
 
-class Restaurants(models.Model):
+class Restaurant(models.Model):
     name = models.CharField(max_length=255)
     delivery_time = models.IntegerField()
     cuisine_type = models.CharField(max_length=50)
@@ -29,7 +30,7 @@ class Restaurants(models.Model):
 
 
 class MenuItem(models.Model):
-    restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -50,3 +51,12 @@ class MenuItem(models.Model):
                 output_size = (300, 300)
                 img.thumbnail(output_size)
                 img.save(self.image.path)
+
+
+class Order(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    items = models.ManyToManyField(MenuItem)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)

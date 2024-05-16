@@ -1,10 +1,10 @@
-from ..models import Restaurants, MenuItem
+from ..models import Restaurant, MenuItem
 from rest_framework import viewsets, generics
 from .serializers import RestaurantsSerializer, MenuItemSerializer
 
 
 class RestaurantViewSet(viewsets.ModelViewSet):
-    queryset = Restaurants.objects.all()
+    queryset = Restaurant.objects.all()
     serializer_class = RestaurantsSerializer
 
 
