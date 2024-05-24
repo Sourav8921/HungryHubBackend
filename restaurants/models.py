@@ -7,7 +7,7 @@ from users.models import CustomUser
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
-    delivery_time = models.IntegerField()
+    delivery_time = models.PositiveIntegerField()
     cuisine_type = models.CharField(max_length=50)
     place = models.CharField(max_length=20)
     image = models.ImageField(default="default.jpg", upload_to="restaurant_pics")
