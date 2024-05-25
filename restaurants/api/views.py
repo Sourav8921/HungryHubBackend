@@ -1,5 +1,6 @@
 from ..models import Restaurant, MenuItem
 from rest_framework import viewsets, generics
+from rest_framework.permissions import AllowAny
 from .serializers import RestaurantsSerializer, MenuItemSerializer
 
 
