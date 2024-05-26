@@ -1,14 +1,20 @@
 from django.contrib import admin
-from .models import Restaurant, MenuItem
+from .models import Restaurant, MenuItem, Order
 
 
-class RestaurantsAdmin(admin.ModelAdmin):
+class RestaurantAdmin(admin.ModelAdmin):
     list_display = ('name', 'cuisine_type', 'place')
 
 
 class MenuItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'restaurant', 'price')
 
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('user', 'restaurant', 'total_price', 'status', 'created_at')
 
-admin.site.register(Restaurant, RestaurantsAdmin)
+
+admin.site.register(Restaurant, RestaurantAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)
+admin.site.register(Order, OrderAdmin)
+
+
