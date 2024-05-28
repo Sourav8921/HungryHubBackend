@@ -4,6 +4,7 @@ from rest_framework import viewsets, generics, status, views
 from rest_framework.response import Response
 from .serializers import RestaurantsSerializer, MenuItemSerializer, OrderSerializer
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 
 class RestaurantViewSet(viewsets.ModelViewSet):
@@ -40,3 +41,33 @@ class CreateOrderView(views.APIView):
             order.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+def search_menu_items(request):
+    query = request.GET.get('q') #request.GET is a dictionary-like object that contains all the parameters passed in the URL query string
+    if query:
+        # Filter menu items containing the search query
+        menu_items = MenuItem.objects.filter(name__icontains=query)
+
+        # Create a list of restaurants associated with the filtered menu items
+        restaurants = []
+        for item in menu_items:
+            if item.restaurant not in restaurants:
+                restaurants.append(item.restaurant)
+
+        results_list = []
+        for restaurant in restaurants:
+            full_image_url = request.build_absolute_uri(restaurant.image.url)
+            results_list.append({
+                'id': restaurant.id,
+                'name': restaurant.name,
+                'delivery_time': restaurant.delivery_time,
+                'cuisine_type': restaurant.cuisine_type,
+                'place': restaurant.place,
+                'image': full_image_url
+            })
+    else:
+        results_list = []
+
+    # Return the list of restaurant objects as JSON response
+    return JsonResponse({'results': results_list})
