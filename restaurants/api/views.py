@@ -23,7 +23,7 @@ class MenuItemsByRestaurantAPIView(generics.ListAPIView):
 class CreateOrderView(views.APIView):
     def post(self, request):
         serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(): #Checks if the data adheres to the defined schema (e.g., types, required fields).
             user = get_object_or_404(CustomUser, id=request.data.get('user'))
             restaurant = get_object_or_404(Restaurant, id=request.data.get('restaurant'))
             total_price = request.data.get('total_price')
