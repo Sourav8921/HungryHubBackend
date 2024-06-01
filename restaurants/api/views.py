@@ -1,6 +1,6 @@
 from ..models import Restaurant, MenuItem, Order
 from users.models import CustomUser
-from rest_framework import viewsets, generics, status, views
+from rest_framework import viewsets, generics, status, views, permissions
 from rest_framework.response import Response
 from .serializers import RestaurantsSerializer, MenuItemSerializer, OrderSerializer
 from django.shortcuts import get_object_or_404
@@ -21,30 +21,31 @@ class MenuItemsByRestaurantAPIView(generics.ListAPIView):
         return queryset
 
 
-class CreateOrderView(views.APIView):
-    def post(self, request):
-        serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid(): #Checks if the data adheres to the defined schema (e.g., types, required fields).
-            user = get_object_or_404(CustomUser, id=request.data.get('user'))
-            restaurant = get_object_or_404(Restaurant, id=request.data.get('restaurant'))
-            total_price = request.data.get('total_price')
-            order = Order.objects.create(
-                user=user,
-                restaurant=restaurant,
-                total_price=total_price,
-                status="Pending"
-            )
-            for item in request.data['items']:
-                menu_item = get_object_or_404(MenuItem, id=item['id'])
-                for _ in range(item['count']):
-                    order.items.add(menu_item)
-            order.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+# class CreateOrderView(views.APIView):
+#     def post(self, request):
+#         serializer = OrderSerializer(data=request.data)
+#         if serializer.is_valid():  # Checks if the data adheres to the defined schema (e.g., types, required fields).
+#             user = get_object_or_404(CustomUser, id=request.data.get('user'))
+#             restaurant = get_object_or_404(Restaurant, id=request.data.get('restaurant'))
+#             total_price = request.data.get('total_price')
+#             order = Order.objects.create(
+#                 user=user,
+#                 restaurant=restaurant,
+#                 total_price=total_price,
+#                 status="Pending"
+#             )
+#             for item in request.data['items']:
+#                 menu_item = get_object_or_404(MenuItem, id=item['id'])
+#                 for _ in range(item['count']):
+#                     order.items.add(menu_item)
+#             order.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 def search_menu_items(request):
-    query = request.GET.get('q') #request.GET is a dictionary-like object that contains all the parameters passed in the URL query string
+    # request.GET is a dictionary-like object that contains all the parameters passed in the URL query string
+    query = request.GET.get('q')
     if query:
         # Filter menu items containing the search query
         menu_items = MenuItem.objects.filter(name__icontains=query)
@@ -71,3 +72,33 @@ def search_menu_items(request):
 
     # Return the list of restaurant objects as JSON response
     return JsonResponse({'results': results_list})
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Filter orders to return only those belonging to the authenticated user
+        return self.queryset.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid():  # Checks if the data adheres to the defined schema (e.g., types, required fields).
+            user = get_object_or_404(CustomUser, id=request.data.get('user'))
+            restaurant = get_object_or_404(Restaurant, id=request.data.get('restaurant'))
+            total_price = request.data.get('total_price')
+            order = Order.objects.create(
+                user=user,
+                restaurant=restaurant,
+                total_price=total_price,
+                status="Pending"
+            )
+            for item in request.data['items']:
+                menu_item = get_object_or_404(MenuItem, id=item['id'])
+                for _ in range(item['count']):
+                    order.items.add(menu_item)
+            order.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
