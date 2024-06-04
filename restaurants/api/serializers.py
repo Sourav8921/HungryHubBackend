@@ -16,6 +16,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = MenuItemSerializer(many=True)
+    restaurant = RestaurantsSerializer(read_only=True)
 
     class Meta:
         model = Order
