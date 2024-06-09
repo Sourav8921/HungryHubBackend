@@ -1,10 +1,15 @@
+import json
+from django.middleware.csrf import get_token
 from ..models import Restaurant, MenuItem, Order
 from users.models import CustomUser
 from rest_framework import viewsets, generics, status, views, permissions
 from rest_framework.response import Response
 from .serializers import RestaurantsSerializer, MenuItemSerializer, OrderSerializer
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
+import stripe
+from django.conf import settings
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 class RestaurantViewSet(viewsets.ModelViewSet):
@@ -80,3 +85,28 @@ class OrderViewSet(viewsets.ModelViewSet):
             order.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# stripe payment integration
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+def create_payment_intent(request):
+    try:
+        data = json.loads(request.body)
+        amount = data.get('amount')
+        if not amount:
+            return HttpResponseBadRequest("Amount is required")
+        intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency='inr',
+        )
+        return JsonResponse({'clientSecret': intent['client_secret']})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrfToken': csrf_token})
