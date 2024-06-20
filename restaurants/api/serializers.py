@@ -2,7 +2,7 @@ from rest_framework import serializers
 from ..models import Restaurant, MenuItem, Order
 
 
-class RestaurantsSerializer(serializers.ModelSerializer):
+class RestaurantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
         fields = '__all__'
@@ -16,7 +16,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = MenuItemSerializer(many=True)
-    restaurant = RestaurantsSerializer(read_only=True)
+    restaurant = RestaurantSerializer(read_only=True)
 
     class Meta:
         model = Order

@@ -4,7 +4,7 @@ from ..models import Restaurant, MenuItem, Order
 from users.models import CustomUser
 from rest_framework import viewsets, generics, status, views, permissions
 from rest_framework.response import Response
-from .serializers import RestaurantsSerializer, MenuItemSerializer, OrderSerializer
+from .serializers import RestaurantSerializer, MenuItemSerializer, OrderSerializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest
 import stripe
@@ -14,7 +14,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
-    serializer_class = RestaurantsSerializer
+    serializer_class = RestaurantSerializer
     
 
 class MenuItemsByRestaurantAPIView(generics.ListAPIView):
@@ -110,3 +110,18 @@ def create_payment_intent(request):
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({'csrfToken': csrf_token})
+
+
+class MenuItemList(generics.ListAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+
+
+# categories view
+class RestaurantsByMenuItem(generics.ListAPIView):
+    serializer_class = RestaurantSerializer
+
+    def get_queryset(self, ):
+        menu_item_id = self.kwargs['menu_item_id']
+        menu_item = MenuItem.objects.filter(id=menu_item_id)
+        return Restaurant.objects.filter(id=menu_item.restaurant_id)
