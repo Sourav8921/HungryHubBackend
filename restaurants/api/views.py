@@ -116,12 +116,3 @@ class MenuItemList(generics.ListAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
-
-# categories view
-class RestaurantsByMenuItem(generics.ListAPIView):
-    serializer_class = RestaurantSerializer
-
-    def get_queryset(self, ):
-        menu_item_id = self.kwargs['menu_item_id']
-        menu_item = MenuItem.objects.filter(id=menu_item_id)
-        return Restaurant.objects.filter(id=menu_item.restaurant_id)

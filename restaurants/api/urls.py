@@ -13,5 +13,4 @@ urlpatterns = [
     path('create-payment-intent/', views.create_payment_intent, name='create-payment-intent'),
     path('get-csrf-token/', views.get_csrf_token, name='get-csrf-token'),
     path('menu-items/list/', views.MenuItemList.as_view(), name='menu-item-list'),
-    path('<int:menu_item_id>/', views.RestaurantsByMenuItem.as_view(), name='restaurants-by-menu-item'),
 ]
