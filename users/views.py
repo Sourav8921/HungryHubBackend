@@ -1,4 +1,4 @@
-from rest_framework import status, generics, permissions
+from rest_framework import status, generics, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -6,8 +6,8 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 
-from .serializers import UserSerializer, UserProfileSerializer
-from .models import CustomUser
+from .serializers import UserSerializer, UserProfileSerializer, DeliveryAddressSerializer
+from .models import CustomUser, DeliveryAddress
 
 
 @api_view(['POST'])
@@ -61,3 +61,15 @@ class ProfileView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class DeliveryAddressViewSet(viewsets.ModelViewSet):
+    queryset = DeliveryAddress.objects.all()
+    serializer_class = DeliveryAddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

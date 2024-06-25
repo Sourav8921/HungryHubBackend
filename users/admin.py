@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser
+from .models import CustomUser, DeliveryAddress
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -7,4 +7,4 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
-
+admin.site.register(DeliveryAddress)
