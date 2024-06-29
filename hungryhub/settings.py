@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os.path
 from pathlib import Path
+import environ
+
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,9 +84,9 @@ WSGI_APPLICATION = 'hungryhub.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hungryhub',
-        'USER': 'postgres',
-        'PASSWORD': 'ainikkadan',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASS'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -139,4 +144,4 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-STRIPE_SECRET_KEY = "sk_test_51PPezlAuFKGwV1a8iFgoxWfctjOGkeQBftE7yesxEJ4TBRJKSHBZ8vzfz0oi545j0SgME4UC5i7sIiQBrMHlH12100xr7eNV1S"
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
