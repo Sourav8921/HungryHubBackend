@@ -4,7 +4,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from django.core.exceptions import ObjectDoesNotExist
 
 from .serializers import UserSerializer, UserProfileSerializer, DeliveryAddressSerializer
 from .models import CustomUser, DeliveryAddress
@@ -26,15 +25,7 @@ def user_login(request):
         username = request.data.get('username')
         password = request.data.get('password')
 
-        user = None
-        if '@' in username:
-            try:
-                user = CustomUser.objects.get(email=username)
-            except ObjectDoesNotExist:
-                pass
-
-        if not user:
-            user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
 
         if user:
             token, _ = Token.objects.get_or_create(user=user)
