@@ -9,7 +9,33 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest
 import stripe
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from geopy.distance import geodesic
+
+
+@csrf_exempt
+def nearby_restaurants(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_location = (data['latitude'], data['longitude'])
+        restaurants = []
+
+        for restaurant in Restaurant.objects.all():
+            full_image_url = request.build_absolute_uri(restaurant.image.url)
+            restaurant_location = (restaurant.latitude, restaurant.longitude)
+            distance = geodesic(user_location, restaurant_location).kilometers
+            if distance <= 10:
+                restaurants.append({
+                    'id': restaurant.id,
+                    'name': restaurant.name,
+                    'delivery_time': restaurant.delivery_time,
+                    'cuisine_type': restaurant.cuisine_type,
+                    'place': restaurant.place,
+                    'image': full_image_url,
+                    'distance': distance,
+                })
+
+        return JsonResponse(restaurants, safe=False)
 
 
 class RestaurantViewSet(viewsets.ModelViewSet):

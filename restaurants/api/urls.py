@@ -8,6 +8,7 @@ router.register(r'orders', views.OrderViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('nearby-restaurants', views.nearby_restaurants, name='nearby_restaurants'),
     path('menu-items/', views.MenuItemsByRestaurantAPIView.as_view(), name='menu_items_by_restaurant'),
     path('search/', views.search_menu_items, name='search_menu_items'),
     path('create-payment-intent/', views.create_payment_intent, name='create-payment-intent'),

@@ -11,6 +11,8 @@ class Restaurant(models.Model):
     cuisine_type = models.CharField(max_length=50)
     place = models.CharField(max_length=20)
     image = models.ImageField(default="default.jpg", upload_to="restaurant_pics")
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
 
     def __str__(self):
         return self.name
