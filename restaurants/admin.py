@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Restaurant, MenuItem, Order
+from .models import Restaurant, MenuItem, Order, Category
 
 
 class RestaurantAdmin(admin.ModelAdmin):
@@ -9,6 +9,7 @@ class RestaurantAdmin(admin.ModelAdmin):
 class MenuItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'restaurant', 'price')
 
+
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('user', 'restaurant', 'total_price', 'status', 'created_at')
 
@@ -16,5 +17,6 @@ class OrderAdmin(admin.ModelAdmin):
 admin.site.register(Restaurant, RestaurantAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(Category)
 
 

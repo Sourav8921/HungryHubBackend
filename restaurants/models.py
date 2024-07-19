@@ -31,9 +31,18 @@ class Restaurant(models.Model):
                 img.save(self.image.path)
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    image = models.ImageField(default="default.jpg", upload_to="category_images")
+
+    def __str__(self):
+        return self.name
+
+
 class MenuItem(models.Model):
+    name = models.CharField(max_length=255)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(default="default.jpg", upload_to="dishes_pics")

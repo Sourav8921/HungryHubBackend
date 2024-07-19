@@ -1,10 +1,10 @@
 import json
 from django.middleware.csrf import get_token
-from ..models import Restaurant, MenuItem, Order
+from ..models import Restaurant, MenuItem, Order, Category
 from users.models import CustomUser
 from rest_framework import viewsets, generics, status, views, permissions
 from rest_framework.response import Response
-from .serializers import RestaurantSerializer, MenuItemSerializer, OrderSerializer
+from .serializers import RestaurantSerializer, MenuItemSerializer, OrderSerializer, CategorySerializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest
 import stripe
@@ -138,7 +138,7 @@ def get_csrf_token(request):
     return JsonResponse({'csrfToken': csrf_token})
 
 
-class MenuItemList(generics.ListAPIView):
-    queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
+class CategoriesView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 

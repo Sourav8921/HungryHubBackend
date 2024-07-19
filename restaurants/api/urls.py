@@ -13,5 +13,5 @@ urlpatterns = [
     path('search/', views.search_menu_items, name='search_menu_items'),
     path('create-payment-intent/', views.create_payment_intent, name='create-payment-intent'),
     path('get-csrf-token/', views.get_csrf_token, name='get-csrf-token'),
-    path('menu-items/list/', views.MenuItemList.as_view(), name='menu-item-list'),
+    path('categories/', views.CategoriesView.as_view(), name='categories'),
 ]
