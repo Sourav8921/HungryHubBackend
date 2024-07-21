@@ -32,7 +32,6 @@ def nearby_restaurants(request):
                     'cuisine_type': restaurant.cuisine_type,
                     'place': restaurant.place,
                     'image': full_image_url,
-                    'distance': distance,
                 })
 
         return JsonResponse(restaurants, safe=False)
@@ -53,13 +52,10 @@ class MenuItemsByRestaurantAPIView(generics.ListAPIView):
 
 
 def search_menu_items(request):
-    # request.GET is a dictionary-like object that contains all the parameters passed in the URL query string
     query = request.GET.get('q')
     if query:
-        # Filter menu items containing the search query
         menu_items = MenuItem.objects.filter(name__icontains=query)
 
-        # Create a list of restaurants associated with the filtered menu items
         restaurants = []
         for item in menu_items:
             if item.restaurant not in restaurants:
@@ -79,7 +75,30 @@ def search_menu_items(request):
     else:
         results_list = []
 
-    # Return the list of restaurant objects as JSON response
+    return JsonResponse({'results': results_list})
+
+
+def restaurants_by_category(request):
+    category_id = request.GET.get('category')
+    if category_id:
+        menu_items = MenuItem.objects.filter(category_id=category_id)
+        restaurants = []
+        for item in menu_items:
+            if item.restaurant not in restaurants:
+                restaurants.append(item.restaurant)
+        results_list = []
+        for restaurant in restaurants:
+            full_image_url = request.build_absolute_uri(restaurant.image.url)
+            results_list.append({
+                'id': restaurant.id,
+                'name': restaurant.name,
+                'delivery_time': restaurant.delivery_time,
+                'cuisine_type': restaurant.cuisine_type,
+                'place': restaurant.place,
+                'image': full_image_url
+            })
+    else:
+        results_list = []
     return JsonResponse({'results': results_list})
 
 
