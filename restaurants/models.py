@@ -82,7 +82,6 @@ class Order(models.Model):
     
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    items = models.ManyToManyField(MenuItem)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(
         max_length=16,
@@ -95,4 +94,7 @@ class Order(models.Model):
         return self.user.username
 
 
-
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    count = models.PositiveIntegerField()
