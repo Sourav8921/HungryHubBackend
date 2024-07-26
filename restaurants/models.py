@@ -38,6 +38,17 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image and hasattr(self.image, 'path') and os.path.exists(self.image.path):
+            img = Image.open(self.image.path)
+
+            if img.height > 150 or img.width > 150:
+                output_size = (150, 150)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
+
 
 class MenuItem(models.Model):
     name = models.CharField(max_length=255)
@@ -53,11 +64,9 @@ class MenuItem(models.Model):
     def __str__(self):
         return self.name
 
-    # function to resize upload image if it exceeds 600px
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        # Check if the image field is not empty and the file exists
         if self.image and hasattr(self.image, 'path') and os.path.exists(self.image.path):
             img = Image.open(self.image.path)
 
@@ -79,7 +88,7 @@ class Order(models.Model):
         ('Failed', 'Failed'),
         ('Refunded', 'Refunded'),
     ]
-    
+
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
