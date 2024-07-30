@@ -1,9 +1,16 @@
+import json
+
 from rest_framework import status, generics, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
+from django.views import View
+import re
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 from .serializers import UserSerializer, UserProfileSerializer, DeliveryAddressSerializer
 from .models import CustomUser, DeliveryAddress
@@ -19,19 +26,45 @@ def register_user(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-def user_login(request):
-    if request.method == 'POST':
-        username = request.data.get('username')
-        password = request.data.get('password')
+class LoginView(View):
+    def validate_username(self, username):
+        return re.match(r'\s+', username)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+
+        if self.validate_username(username):
+            return JsonResponse({'error': 'No whitespace characters'}, status=400)
+        if len(password) < 6:
+            return JsonResponse({'error': 'Password must be at least 6 characters'}, status=400)
 
         user = authenticate(username=username, password=password)
-
-        if user:
+        if user is not None:
             token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return JsonResponse({'token': token.key})
+        else:
+            return JsonResponse({'error': 'Invalid credentials'}, status=400)
 
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+#
+# @api_view(['POST'])
+# def user_login(request):
+#     if request.method == 'POST':
+#         username = request.data.get('username')
+#         password = request.data.get('password')
+#
+#         user = authenticate(username=username, password=password)
+#
+#         if user:
+#             token, _ = Token.objects.get_or_create(user=user)
+#             return Response({'token': token.key}, status=status.HTTP_200_OK)
+#
+#         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
