@@ -2,48 +2,26 @@ import json
 from django.middleware.csrf import get_token
 from restaurants.models import Restaurant, MenuItem, Order, Category, OrderItem
 from users.models import CustomUser
-from rest_framework import viewsets, generics, status, permissions
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from restaurants.serializers import RestaurantSerializer, MenuItemSerializer, OrderSerializer, CategorySerializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest
 import stripe
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-from geopy.distance import geodesic
-
-
-# @csrf_exempt
-# def nearby_restaurants(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         user_location = (data['latitude'], data['longitude'])
-#         restaurants = []
-#
-#         for restaurant in Restaurant.objects.all():
-#             full_image_url = request.build_absolute_uri(restaurant.image.url)
-#             restaurant_location = (restaurant.latitude, restaurant.longitude)
-#             distance = geodesic(user_location, restaurant_location).kilometers
-#             if distance <= 10:
-#                 restaurants.append({
-#                     'id': restaurant.id,
-#                     'name': restaurant.name,
-#                     'delivery_time': restaurant.delivery_time,
-#                     'cuisine_type': restaurant.cuisine_type,
-#                     'place': restaurant.place,
-#                     'image': full_image_url,
-#                 })
-#
-#         return JsonResponse(restaurants, safe=False)
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
+    permission_classes = [IsAuthenticated]
     
 
 class MenuItemsByRestaurantAPIView(generics.ListAPIView):
     serializer_class = MenuItemSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         restaurant__id = self.request.query_params.get('restaurant_id')
@@ -105,7 +83,7 @@ def restaurants_by_category(request):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -158,3 +136,4 @@ def get_csrf_token(request):
 class CategoriesView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]

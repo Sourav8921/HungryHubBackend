@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os.path
 from pathlib import Path
 import environ
+from datetime import timedelta
 
 
 env = environ.Env()
@@ -43,7 +44,6 @@ INSTALLED_APPS = [
     'restaurants.apps.RestaurantsConfig',
     'users.apps.UsersConfig',
     'rest_framework',
-    'rest_framework.authtoken',
     'corsheaders'
 ]
 
@@ -138,10 +138,17 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+
+SIMPLE_JWT = {
+     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+     'ROTATE_REFRESH_TOKENS': False,
+     'BLACKLIST_AFTER_ROTATION': False,
+}
