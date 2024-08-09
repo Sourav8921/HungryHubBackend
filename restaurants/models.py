@@ -54,12 +54,16 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=255)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(default="default.jpg", upload_to="dishes_pics")
 
     class Meta:
-        indexes = [models.Index(fields=["name"])]
+        indexes = [
+            models.Index(fields=["name"]),
+            models.Index(fields=["restaurant"]),
+            models.Index(fields=["category"]),
+        ]
 
     def __str__(self):
         return self.name

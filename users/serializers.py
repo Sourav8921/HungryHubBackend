@@ -8,14 +8,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'phone_number']
         extra_kwargs = {'password': {'write_only': True}}
 
+    @staticmethod
+    def validate_password(value):
+        if len(value) < 6:
+            raise serializers.ValidationError("Password must be at least 6 characters long.")
+        return value
+
     def create(self, validated_data):
-        # Method to create a new user instance
-        # Extract validated data and use it to create a new user
         user = CustomUser(
             username=validated_data['username'],
             email=validated_data['email']
         )
-        # Set the password for the user using the hashed password from validated data
         user.set_password(validated_data['password'])
         user.save()
         return user
