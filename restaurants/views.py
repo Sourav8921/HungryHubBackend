@@ -80,32 +80,58 @@ def restaurants_by_category(request):
     return JsonResponse({'results': results_list})
 
 
+def create_order(order_details):
+    items_data = order_details.pop('items')
+    user = get_object_or_404(CustomUser, id=order_details['user'])
+    restaurant = get_object_or_404(Restaurant, id=order_details['restaurant'])
+    order = Order.objects.create(
+        user=user,
+        restaurant=restaurant,
+        total_price=order_details['total_price'],
+        status=order_details["status"]
+    )
+    for item_data in items_data:
+        menu_item = MenuItem.objects.get(id=item_data['id'])
+        OrderItem.objects.create(order=order, menu_item=menu_item, count=item_data['count'])
+
+    return order
+
+
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        items_data = data.pop('items')
-        user = get_object_or_404(CustomUser, id=data['user'])
-        restaurant = get_object_or_404(Restaurant, id=data['restaurant'])
-        order = Order.objects.create(
-            user=user,
-            restaurant=restaurant,
-            total_price=data['total_price'],
-            status=data["status"]
-        )
-        for item_data in items_data:
-            menu_item = MenuItem.objects.get(id=item_data['id'])
-            OrderItem.objects.create(order=order, menu_item=menu_item, count=item_data['count'])
-        serializer = self.get_serializer(order)
-        return Response(serializer.data)
+    def get_queryset(self):
+        # Filter orders to return only those belonging to the authenticated user
+        return self.queryset.filter(user=self.request.user)
 
-    def retrieve(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = self.get_serializer(order)
-        return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+
+        payment_method = request.data.get('payment_method')
+        order_details = request.data.get('order_details')
+
+        if payment_method == 'stripe':
+            # Stripe payment verification
+            payment_intent_id = request.data.get('payment_intent_id')
+            try:
+                payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+                if payment_intent["status"] == 'succeeded':
+                    # Payment was successful, create the order
+                    order = create_order(order_details)
+                    serializer = self.get_serializer(order)
+                    return Response(serializer.data)
+                else:
+                    return Response({'success': False, 'error': 'Payment not completed'}, status=400)
+            except Exception as e:
+                return Response({'success': False, 'error': str(e)}, status=500)
+        elif payment_method == 'cod':
+            # Create the order directly for Cash on Delivery
+            order = create_order(order_details)
+            serializer = self.get_serializer(order)
+            return Response(serializer.data)
+        else:
+            return Response({'success': False, 'error': 'Invalid payment method'}, status=400)
 
 
 # stripe payment integration
@@ -122,7 +148,10 @@ def create_payment_intent(request):
             amount=amount,
             currency='inr',
         )
-        return JsonResponse({'clientSecret': intent['client_secret']})
+        return JsonResponse({
+            'clientSecret': intent['client_secret'],
+            'paymentIntentId': intent['id']
+        })
     except Exception as e:
         return JsonResponse({'error': str(e)})
 
@@ -137,3 +166,4 @@ class CategoriesView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
+

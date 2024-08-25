@@ -17,32 +17,6 @@ def register_user(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class LoginView(View):
-#     def validate_username(self, username):
-#         return re.match(r'\s+', username)
-#
-#     @method_decorator(csrf_exempt)
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-#
-#     def post(self, request, *args, **kwargs):
-#         data = json.loads(request.body)
-#         username = data.get('username')
-#         password = data.get('password')
-#
-#         if self.validate_username(username):
-#             return JsonResponse({'error': 'No whitespace characters'}, status=400)
-#         if len(password) < 6:
-#             return JsonResponse({'error': 'Password must be at least 6 characters'}, status=400)
-#
-#         user = authenticate(username=username, password=password)
-#         if user is not None:
-#             token, _ = Token.objects.get_or_create(user=user)
-#             return JsonResponse({'token': token.key})
-#         else:
-#             return JsonResponse({'error': 'Invalid credentials'}, status=400)
-
-
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated]
