@@ -1,3 +1,54 @@
-.venv/
-.idea/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+
+# Ignore local settings
+/local_settings.py
+
+# Ignore environment variables files
 .env
+
+# Ignore virtual environment directories
+venv/
+env/
+venv*/
+ENV/
+.venv/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Ignore IDE/editor-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore node_modules folder (if you use npm/yarn for frontend)
+node_modules/
+
+# Ignore static and media files (optional)
+staticfiles/
+media/
+
+# Ignore files related to AWS Elastic Beanstalk
+.elasticbeanstalk/
+*.ebextensions/
+.ebignore
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Python egg info
+*.egg-info/
+*.egg
