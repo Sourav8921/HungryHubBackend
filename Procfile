@@ -1,0 +1,1 @@
+web: gunicorn hungryhub.wsgi:application --log-file -
