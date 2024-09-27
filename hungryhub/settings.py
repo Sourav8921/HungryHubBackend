@@ -88,8 +88,8 @@ DATABASES = {
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASS'),
-        'HOST': 'hungryhub-database.c90ciwcmincs.ap-south-1.rds.amazonaws.com',
-        'PORT': '5432',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 

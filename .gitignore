@@ -44,7 +44,6 @@ media/
 # Ignore files related to AWS Elastic Beanstalk
 .elasticbeanstalk/
 *.ebextensions/
-.ebignore
 
 # Ignore macOS system files
 .DS_Store
