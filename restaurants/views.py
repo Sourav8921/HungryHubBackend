@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest
 import stripe
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 
 
 class RestaurantViewSet(viewsets.ModelViewSet):
@@ -138,6 +138,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
+@csrf_exempt
 def create_payment_intent(request):
     try:
         data = json.loads(request.body)
